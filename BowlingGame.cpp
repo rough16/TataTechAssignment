@@ -1,3 +1,4 @@
+//vector<int> roll{10,5,5,3,7,10,4,3,10,10,2,8,6,2,7,3};
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -107,6 +108,14 @@ public:
 		mFrameStore.push_back(frame);
 		return ReturnCode::SUCESS;
 	}
+	int displayFrame()
+	{
+	    for(auto var : mFrameStore)
+	    {
+	        std::cout<<var->pointsFromFrame()<<"\n";
+	    }
+	    return ReturnCode::SUCESS;
+	}
 };
 class IGameManager {
     public:
@@ -130,7 +139,7 @@ public:
 		int bonus = 0;
 		int i=2;
 		mBowling = new Bowling();
-		while(i < rolls.size())
+		while((i <= rolls.size()) && (mFrameCounter < 10))
 		{
 			mFrame = new Frame();
 			if((first == 10))
@@ -138,6 +147,7 @@ public:
 				//Strike
 				i=i-1;
 				bonus = rolls[i] + rolls[i+1];
+				mFrame->pointsCurrentFrame(first+bonus);
 				first=rolls[i];
 				second=rolls[i+1];
 				mFrame->isStrike(true);
@@ -147,7 +157,6 @@ public:
 				mFrame->extraRoll(-1);
 				mFrame->nextFirstRoll(rolls[i]);
 				mFrame->nextSecondRoll(rolls[i+1]);
-				mFrame->pointsCurrentFrame(first+bonus);
 				mBowling->insertFrame(mFrame);
 				i=i+2;
 				mFrameCounter++;
@@ -156,29 +165,23 @@ public:
 			{
 				//Spare
 				bonus = rolls[i];
+				mFrame->pointsCurrentFrame(first +second + bonus);
 				first = rolls[i];
 				second = rolls[i+1];
 				mFrame->isStrike(false);
 				mFrame->isSpare(true);
 				mFrame->firstRoll(first);
 				mFrame->secondRoll(second);
-				if(mFrameCounter == 9)
-				{
-					mFrame->extraRoll(rolls[i]);
-				}
-				else
-				{
-					mFrame->extraRoll(-1);
-				}
+				mFrame->extraRoll(-1);
 				mFrame->nextFirstRoll(rolls[i]);
 				mFrame->nextSecondRoll(rolls[i+1]);
-				mFrame->pointsCurrentFrame(first +second + bonus);
 				mBowling->insertFrame(mFrame);
 				i=i+2;
 				mFrameCounter++;
 			}
 			else if((first + second < 10))
 			{
+			    mFrame->pointsCurrentFrame(first +second);
 				first = rolls[i];
 				second = rolls[i+1];
 				mFrame->isStrike(false);
@@ -188,7 +191,6 @@ public:
 				mFrame->extraRoll(-1);
 				mFrame->nextFirstRoll(rolls[i]);
 				mFrame->nextSecondRoll(rolls[i+1]);
-				mFrame->pointsCurrentFrame(first +second);
 				mBowling->insertFrame(mFrame);
 				i=i+2;
 				mFrameCounter++;
@@ -207,6 +209,8 @@ int main()
 {
 	vector<int> roll{1,4,4,5,6,4,5,5,10,0,1,7,3,6,4,10,2,8,6};
 	//vector<int> roll{10,10,10,10,10,10,10,10,10,10,10,10};
+	//vector<int> roll{10,5,5,3,7,10,4,3,10,10,2,8,6,2,7,2};
+	//20 +13 +20 +17 +7 +22 +20 +16 +8 +10 //153
 IGameManager *game = new GameManager();
 game->executeGame(roll);
 game->showScore();
